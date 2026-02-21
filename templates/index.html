@@ -3,152 +3,166 @@
 <head>
     <title>Fantasy Football Predictor</title>
     <style>
-        /* BASE PAGE */
         body {
             font-family: 'Courier New', monospace;
-            background-color:white;
-            color: black;
-            margin: 0;
-            padding: 50px 0;
+            margin: 0; 
+            padding: 50px;
             display: flex;
-            justify-content: center;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 20px;
+            height: 100vh;
+            box-sizing: border-box;
+            background-image: url('f.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
         }
-
-        /* CARD CONTAINER */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(128, 128, 128, 0.493);
+            backdrop-filter: blur(5px);
+            z-index: 0;
+        }
+        .card, #resultsContainer {
+            position: relative;
+            z-index: 1;
+        }
         .card {
-            background-color: lightgray;
-            border: 1px solid gray;
+            background-color: coral;
+            border: 2px solid black;
             border-radius: 8px;
-            width: 450px;
-            padding: 25px;
+            width: 400px;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-shrink: 0;
         }
-
         h1, h2 {
-            font-family: 'Courier New', monospace;
-            margin-bottom: 20px;
+            margin: 0;
             letter-spacing: 1px;
         }
-
         h1 {
             font-size: 24px;
             text-align: center;
+            margin-bottom: 10px;
         }
-
         h2 {
             font-size: 18px;
             border-bottom: 1px solid gray;
             padding-bottom: 5px;
         }
-
-        /* LABELS & INPUTS */
         label {
-            display: block;
-            margin-top: 15px;
             font-size: 13px;
             letter-spacing: 0.5px;
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            padding-left: 5px;
+            padding-right: 5px;
         }
-
-        input, select {
+        input {
             width: 100%;
             padding: 8px;
             margin-top: 5px;
             background-color: white;
-            border: 1px solid gray;
+            border: 2px solid gray;
             border-radius: 4px;
-            color: black;
             font-family: 'Courier New', monospace;
             font-size: 14px;
+            box-sizing: border-box;
+            padding-left: 5px;
+            padding-right: 5px;
         }
-
-        input:focus, select:focus {
+        input:focus {
             outline: none;
             border-color: black;
         }
-
-        /* BUTTON */
         button {
             width: 100%;
             padding: 10px;
-            margin-top: 25px;
             border: none;
             border-radius: 4px;
             background-color: white;
-            color: black;
             font-family: 'Courier New', monospace;
             font-weight: bold;
             cursor: pointer;
             letter-spacing: 0.5px;
-            border: 1px solid black;
+            border: 2px solid black;
+            margin-top: 10px;
         }
-
         button:hover {
             background-color: white;
         }
-
-        /* RESULTS */
-        .results {
-            margin-top: 20px;
+        #resultsContainer {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: 100%;
+            overflow-y: auto;
         }
-
-        .player {
+        .results-card {
             background-color: white;
+            border: 2px solid black;
+            border-radius: 8px;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .player {
             border-left: 3px solid black;
             padding: 10px;
-            margin-top: 8px;
             font-size: 14px;
         }
-
     </style>
 </head>
 <body>
-
 <div class="card">
     <h1>Fantasy Football Predictor</h1>
-
     <h2>League Details</h2>
-
     <label for="leagueSize">League Size</label>
-    <input type="number" id="leagueSize" placeholder="e.g., 12">
-
-    <label for="currentRound">Current Round</label>
-    <input type="number" id="currentRound" placeholder="e.g., 3">
-
+    <input type="number" id="leagueSize">
+    <label for="numRounds">Number of Rounds</label>
+    <input type="number" id="numRounds">
     <label for="draftPosition">Draft Position</label>
-    <input type="number" id="draftPosition" placeholder="e.g., 5">
-
+    <input type="number" id="draftPosition">
     <button onclick="predict()">Predict Best Picks</button>
-
-    <div class="results" id="results"></div>
 </div>
-
+<div id="resultsContainer"></div>
 <script>
 async function predict() {
-    const resultsDiv = document.getElementById("results");
-    resultsDiv.innerHTML = "Loading...";
-
+    const container = document.getElementById("resultsContainer");
+    container.innerHTML = "";
+    const resultsCard = document.createElement("div");
+    resultsCard.className = "results-card";
+    resultsCard.innerHTML = "<strong>Predicted Players:</strong>";
+    container.appendChild(resultsCard);
     const leagueSize = document.getElementById("leagueSize").value;
-    const draftType = document.getElementById("draftType").value;
-    const currentRound = document.getElementById("currentRound").value;
+    const numRounds = document.getElementById("numRounds").value;
     const draftPosition = document.getElementById("draftPosition").value;
-
-    // Mock Data for now
     const mockData = [
         { name: "Player A", score: 22.4 },
         { name: "Player B", score: 19.8 },
         { name: "Player C", score: 17.1 }
     ];
-
-    resultsDiv.innerHTML = "";
     mockData.forEach(player => {
         const div = document.createElement("div");
         div.className = "player";
         div.innerHTML = `<strong>${player.name}</strong> - ${player.score} pts`;
-        resultsDiv.appendChild(div);
+        resultsCard.appendChild(div);
     });
-
-    console.log("League Details:", { leagueSize, draftType, currentRound, draftPosition });
 }
 </script>
-
 </body>
 </html>
