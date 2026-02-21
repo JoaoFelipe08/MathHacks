@@ -91,7 +91,7 @@ def simulate_draft(adp_df, num_teams, rounds, user_team):
 
         # Update user roster
         if team == user_team:
-            pos = player["POS"]
+            pos = player["player"]
             user_roster[pos] = user_roster.get(pos, 0) + 1
 
         # Remove picked player
