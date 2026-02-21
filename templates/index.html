@@ -148,13 +148,10 @@ async function predict() {
     resultsCard.className = "results-card";
     resultsCard.innerHTML = "<strong>Predicted Players:</strong>";
     container.appendChild(resultsCard);
-    const leagueSize = document.getElementById("leagueSize").value;
-    const numRounds = document.getElementById("numRounds").value;
-    const draftPosition = document.getElementById("draftPosition").value;
 
     const data = {
         leagueSize: document.getElementById("leagueSize").value,
-        draftType: document.getElementById("draftType").value,
+        numRounds: document.getElementById("numRounds").value,
         draftPosition: document.getElementById("draftPosition").value
     };
 
@@ -167,8 +164,6 @@ async function predict() {
     });
 
     const result = await response.json();
-
-    resultsDiv.innerHTML = "";
 
     result.players.forEach(player => {
         const div = document.createElement("div");

@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, render_template
 import pandas as pd
-import nflreadpy as nfl
-import polars as pl
+# import nflreadpy as nfl
+import polars as pl # I dont have polars
 import random
 
 app = Flask(__name__)
@@ -19,18 +19,38 @@ def predict():
     data = request.get_json()
 
     league_size = int(data["leagueSize"])
-    draft_type = data["draftType"]
-    current_round = int(data["currentRound"])
     draft_position = int(data["draftPosition"])
+    numRounds = int(data["numRounds"])
 
-    print("Received:", league_size, draft_type, current_round, draft_position)
+    print("Received:", league_size, numRounds, draft_position)
 
     # Temporary fake calculation
-    players = [
-        {"name": "Player A", "score": 20 + current_round},
+    players = [ # make a real calculation when?
+        {"name": "Player A", "score": 20 }, 
         {"name": "Player B", "score": 18 + draft_position},
         {"name": "Player C", "score": 15 + league_size}
     ]
+
+
+    stats = stats.filter(
+    pl.col("position").is_in(
+        ["QB", "RB", "WR", "TE"]
+    )
+    )
+
+    # Group players
+    players = group_and_aggregate(stats)
+    # Add projections
+    players = add_projected_points(players)
+    # Sort players
+    players = players.sort(
+
+        "projected_points",
+        descending=True
+
+    )
+
+    snakeLadder = simulate_snake_draft_pts(players, league_size, numRounds, draft_position)
 
     return jsonify({"players": players})
 
@@ -237,91 +257,3 @@ def simulate_snake_draft_pts(player_pool, num_teams, rounds, user_team):
         )
 
     return user_roster
-
-
-# =====================================================
-# MAIN PROGRAM
-# =====================================================
-
-print("Loading NFL data...")
-
-stats = nfl.load_player_stats(2024)
-
-stats = stats.fill_nan(0)
-
-# Only skill positions
-stats = stats.filter(
-
-    pl.col("position").is_in(
-
-        ["QB", "RB", "WR", "TE"]
-
-    )
-
-)
-
-# Group players
-players = group_and_aggregate(stats)
-
-# Add projections
-players = add_projected_points(players)
-
-# Sort players
-players = players.sort(
-
-    "projected_points",
-    descending=True
-
-)
-
-# Show top players
-print("\nTop 20 Players:")
-
-print(
-
-    players.select(
-
-        ["player_name", "position", "projected_points"]
-
-    ).head(20)
-
-)
-
-
-# =====================================================
-# Run snake draft
-# =====================================================
-
-num_teams = int(input("\nNumber of teams: "))
-
-rounds = int(input("Number of rounds: "))
-
-user_team = int(input("Your draft position: "))
-
-
-user_roster = simulate_snake_draft_pts(
-
-    players,
-    num_teams,
-    rounds,
-    user_team
-
-)
-
-
-# =====================================================
-# Print your roster
-# =====================================================
-
-print("\nYOUR TEAM:\n")
-
-for player in user_roster:
-
-    print(
-
-        f"Round {player['round']} | "
-        f"{player['player']} | "
-        f"{player['position']} | "
-        f"{player['projected_points']} pts"
-
-    )
