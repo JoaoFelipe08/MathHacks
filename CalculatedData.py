@@ -1,45 +1,6 @@
-from flask import Flask, jsonify, request, render_template
-import pandas as pd
 import nflreadpy as nfl
 import polars as pl
 import random
-
-app = Flask(__name__)
-
-data_store_fan = {}
-data_store_real = {} 
-
-@app.route("/")
-def home():
-    return render_template("index.html")
-
-
-@app.route("/predict", methods=["POST"])
-def predict():
-    data = request.get_json()
-
-    league_size = int(data["leagueSize"])
-    draft_type = data["draftType"]
-    current_round = int(data["currentRound"])
-    draft_position = int(data["draftPosition"])
-
-    print("Received:", league_size, draft_type, current_round, draft_position)
-
-    # Temporary fake calculation
-    players = [
-        {"name": "Player A", "score": 20 + current_round},
-        {"name": "Player B", "score": 18 + draft_position},
-        {"name": "Player C", "score": 15 + league_size}
-    ]
-
-    return jsonify({"players": players})
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
-
-
-# Draft Generator Based on Projected Points
 
 # =====================================================
 # Projection multiplier function
@@ -152,7 +113,7 @@ def generate_snake_order(num_teams, rounds):
 # Snake draft simulation with roster limits
 # =====================================================
 
-def simulate_snake_draft_pts(player_pool, num_teams, rounds, user_team):
+def simulate_snake_draft(player_pool, num_teams, rounds, user_team):
 
     ROSTER_REQUIREMENTS = {
 
@@ -299,7 +260,7 @@ rounds = int(input("Number of rounds: "))
 user_team = int(input("Your draft position: "))
 
 
-user_roster = simulate_snake_draft_pts(
+user_roster = simulate_snake_draft(
 
     players,
     num_teams,
